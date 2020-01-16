@@ -16,9 +16,9 @@
         <activity android:name=".Login.SignUpActivity" />
         <activity android:name=".STTS.STTSActivity" />
         <service android:name=".STTS.STTservice"/>
-        <activity android:name=".HomeActivity">
+        <activity android:name=".HomeActivity"/>
 
-        </activity>
+
         <activity android:name=".Login.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

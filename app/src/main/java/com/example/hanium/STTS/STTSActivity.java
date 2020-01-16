@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -121,28 +122,47 @@ public class STTSActivity extends AppCompatActivity {
                     Toast.makeText(STTSActivity.this, "학습을 완료하였습니다.", Toast.LENGTH_SHORT).show();
                 else {
                     String txt = s1eng[nowIndex];
-                    Log.d(TAG,txt);
+                    Log.d(TAG,"시작");
                     speech(txt);
+
                     txtRead.setText(txt);
                     nowIndex++;
+
                 }
             }
         });
-
         txtRead = (TextView) findViewById(R.id.txtRead);
         txtSpeech=(TextView) findViewById(R.id.sttext);
 
         tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int isAvailable) {
-                if(isAvailable == TextToSpeech.SUCCESS) {
+                if (isAvailable == TextToSpeech.SUCCESS) {
                     int language = tts.setLanguage(Locale.ENGLISH);
-                    if(language == TextToSpeech.LANG_MISSING_DATA || language == TextToSpeech.LANG_NOT_SUPPORTED) {
+                    if (language == TextToSpeech.LANG_MISSING_DATA || language == TextToSpeech.LANG_NOT_SUPPORTED) {
                         Toast.makeText(STTSActivity.this, "지원되지 않는 언어입니다.", Toast.LENGTH_SHORT).show();
                         isAvailableToTTS = false;
                     } else {
                         isAvailableToTTS = true;
                     }
+                    tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                        @Override
+                        public void onStart(String s) {
+                            Log.d(TAG, "TTS On Start");
+                        }
+
+                        @Override
+                        public void onDone(String s) {
+                            Log.d(TAG, "TTS On Done");
+
+                        }
+
+                        @Override
+                        public void onError(String s) {
+                            Log.d(TAG, "TTS On Error");
+
+                        }
+                    });
                 }
             }
         });
@@ -150,7 +170,7 @@ public class STTSActivity extends AppCompatActivity {
 
     public void speech(String message) {
         if (isAvailableToTTS) {
-            tts.speak(message.trim(), TextToSpeech.QUEUE_FLUSH, null, null);
+            tts.speak(message.trim(), TextToSpeech.QUEUE_FLUSH, null, TextToSpeech.ACTION_TTS_QUEUE_PROCESSING_COMPLETED);
         }
     }
 
@@ -167,6 +187,7 @@ public class STTSActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             if(intent.getAction().equals("get_stt_result")) {
                 ArrayList<String> results = intent.getStringArrayListExtra("result");
+
                 txtSpeech.setText(results.toString());
                 unregisterReceiver(myBroadCastReceiver);
                 if(STTservice != null) {
