@@ -3,6 +3,7 @@ package com.example.hanium;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
@@ -26,6 +27,7 @@ import com.baoyz.swipemenulistview.SwipeMenu;
 import com.baoyz.swipemenulistview.SwipeMenuCreator;
 import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
+import com.example.hanium.Chat.ChatActivity;
 import com.example.hanium.Login.LoginActivity;
 import com.example.hanium.STTS.STTSActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -58,6 +60,7 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
         setContentView(R.layout.home_interface);
         final Intent STTS_intent = new Intent(HomeActivity.this, STTSActivity.class);
         final Intent Voca_intent = new Intent(HomeActivity.this, VocaActivity.class);
+        final Intent Chat_intent = new Intent(HomeActivity.this, ChatActivity.class);
         listView = (SwipeMenuListView) findViewById(R.id.listView);
         listView.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
         myBtn = (Button) findViewById(R.id.my_bar);
@@ -71,13 +74,17 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
             public void create(SwipeMenu menu) {
                 SwipeMenuItem study = new SwipeMenuItem(getApplicationContext());
                 study.setWidth(dp2px(90));
-                study.setIcon(R.drawable.study);
-//                study.setBackground(new ColorDrawable(Color.parseColor("#FFFFB6C1")));
+                study.setTitle("study");
+                study.setTitleSize(18);
+                study.setTitleColor(Color.WHITE);
+                study.setBackground(new ColorDrawable(Color.parseColor("#FFFFB6C1")));
                 menu.addMenuItem(study);
                 SwipeMenuItem voca = new SwipeMenuItem(getApplicationContext());
                 voca.setWidth(dp2px(90));
-//                voca.setBackground(new ColorDrawable(Color.parseColor("#FFFFFFFF")));
-                voca.setIcon(R.drawable.voca);
+                voca.setTitleColor(Color.parseColor("#FFFFB6C1"));
+                voca.setTitle("voca");
+                voca.setTitleSize(18);;
+                voca.setBackground(new ColorDrawable(Color.parseColor("#FFFFFFFF")));
                 menu.addMenuItem(voca);
             }
         };
@@ -93,12 +100,20 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
                         else {
                             Log.d(TAG, String.valueOf(position));
                             switch (position){
-                                case 0: data.setData("s1");break;
-                                case 1: data.setData("s2");break;
-                                case 2: data.setData("d");break;
+                                case 0:
+                                    data.setData("s1");
+                                    STTS_intent.putExtra("data",(Parcelable)data);
+                                    startActivity(STTS_intent);break;
+                                case 1:
+                                    data.setData("s2");
+                                    STTS_intent.putExtra("data",(Parcelable)data);
+                                    startActivity(STTS_intent);break;
+                                case 2:
+                                    data.setData("d");
+                                    Chat_intent.putExtra("data",(Parcelable)data);
+                                    startActivity(Chat_intent);break;
                             }
-                            STTS_intent.putExtra("data",(Parcelable)data);
-                            startActivity(STTS_intent);
+
                         }
                         break;
                     case 1:
@@ -121,7 +136,7 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
                         }
                         break;
                 }
-                return true;
+                return false;
             }
         });
         listView.setOnMenuStateChangeListener(new SwipeMenuListView.OnMenuStateChangeListener() {

@@ -4,6 +4,7 @@ package com.example.hanium.Chat;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,11 +24,13 @@ public class ChatArrayAdapter extends ArrayAdapter {
     private List chatMessageList = new ArrayList();
     private LinearLayout singleMessageContainer;
 
+
     //@Override
     public void add(ChatMessage object) {
         chatMessageList.add(object);
         super.add(object);
     }
+
 
     public ChatArrayAdapter(Context context, int textViewResourceId) {
         super(context, textViewResourceId);
@@ -52,8 +55,18 @@ public class ChatArrayAdapter extends ArrayAdapter {
         chatText = (TextView) row.findViewById(R.id.singleMessage);
         chatText.setText(chatMessageObj.message);
         //chatText.setTextColor();
-        chatText.setBackgroundResource(chatMessageObj.left ? R.drawable.bubble_com : R.drawable.bubble_user); //이미지 번갈아 출력
-        singleMessageContainer.setGravity(chatMessageObj.left ? Gravity.LEFT : Gravity.RIGHT); //좌측&우측정렬 번갈아 실행
+        if(position%3==2){
+            chatText.setBackgroundColor(Color.parseColor("#FFFFB6C1"));
+            singleMessageContainer.setGravity(Gravity.RIGHT);
+        }
+        else if(position%3==0){
+            chatText.setBackgroundResource( R.drawable.bubble_com); //이미지 번갈아 출력
+            singleMessageContainer.setGravity(Gravity.LEFT); //좌측&우측정렬 번갈아 실행
+        }
+        else{
+            chatText.setBackgroundResource(R.drawable.bubble_user); //이미지 번갈아 출력
+            singleMessageContainer.setGravity(Gravity.RIGHT ); //좌측&우측정렬 번갈아 실행
+        }
         return row;
     }
 

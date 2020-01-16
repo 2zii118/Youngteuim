@@ -17,6 +17,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.hanium.IntentData;
 import com.example.hanium.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -32,6 +33,7 @@ public class STTSActivity extends AppCompatActivity {
     /**
      * Made By LSC
      */
+    IntentData intentdata;
     FirebaseFirestore db= FirebaseFirestore.getInstance();
     private final String TAG = "[MyLog]";
     Button ttspeech,stt;
@@ -44,7 +46,8 @@ public class STTSActivity extends AppCompatActivity {
     private Intent STTservice;
     private MyBroadcastReceiver myBroadCastReceiver;
 
-    String date;
+    String date,data,seng,skor;
+    String[] aeng,akor,bkor,beng;
     String[] s1eng=null;
     private int nowIndex = 0;
     private int cnt = 0;
@@ -56,7 +59,9 @@ public class STTSActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.stts_interface);
-        date=getIntent().getStringExtra("date");
+        intentdata = (IntentData) getIntent().getParcelableExtra("data");
+        date=intentdata.getDate();
+        data=intentdata.getData();
         db.collection("sentence").document(date)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -65,8 +70,25 @@ public class STTSActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             DocumentSnapshot document = task.getResult();
                             if (document.exists()) {
-                                String s=document.get("s1eng").toString();
-                                Log.d(TAG,s);
+                                if(data.equals("s1")) {
+                                    seng = document.get("s1eng").toString();
+                                    skor=document.get("s1kor").toString();
+                                }
+                                else if(data.equals("s2")) {
+                                    seng= document.get("s2eng").toString();
+                                    skor=document.get("s2kor").toString();
+                                }
+                                else if(data.equals("d")){
+                                    aeng[0]=document.get("a1eng").toString();
+                                    aeng[1]=document.get("a2eng").toString();
+                                    beng[0]=document.get("b1eng").toString();
+                                    beng[1]=document.get("b2eng").toString();
+                                    akor[0]=document.get("a1kor").toString();
+                                    akor[1]=document.get("a2kor").toString();
+                                    bkor[0]=document.get("b1kor").toString();
+                                    bkor[1]=document.get("b2kor").toString();
+                                }
+
                                 s1eng=document.get("s1eng").toString().split("\\.");
                                 cnt=s1eng.length;
                                 Log.d(TAG,"문장불러오기 성공"+cnt);
@@ -187,7 +209,6 @@ public class STTSActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             if(intent.getAction().equals("get_stt_result")) {
                 ArrayList<String> results = intent.getStringArrayListExtra("result");
-
                 txtSpeech.setText(results.toString());
                 unregisterReceiver(myBroadCastReceiver);
                 if(STTservice != null) {
