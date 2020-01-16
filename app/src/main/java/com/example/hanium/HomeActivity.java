@@ -3,8 +3,8 @@ package com.example.hanium;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 
+
 public class HomeActivity<listAdapter> extends AppCompatActivity {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     private static final String TAG = "HomeActivity";
@@ -48,7 +49,7 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
     private SwipeMenuListView listView;
     private ArrayList<String> arrayList = new ArrayList<>();
     private ListDataAdapter listAdapter;
-
+    IntentData data=new IntentData();
     CalendarView cal;
     User user;
     @Override
@@ -56,6 +57,7 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_interface);
         final Intent STTS_intent = new Intent(HomeActivity.this, STTSActivity.class);
+        final Intent Voca_intent = new Intent(HomeActivity.this, VocaActivity.class);
         listView = (SwipeMenuListView) findViewById(R.id.listView);
         listView.setSwipeDirection(SwipeMenuListView.DIRECTION_LEFT);
         myBtn = (Button) findViewById(R.id.my_bar);
@@ -67,14 +69,14 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
         SwipeMenuCreator creator = new SwipeMenuCreator() {
             @Override
             public void create(SwipeMenu menu) {
-                SwipeMenuItem study = new SwipeMenuItem(HomeActivity.this);
+                SwipeMenuItem study = new SwipeMenuItem(getApplicationContext());
                 study.setWidth(dp2px(90));
                 study.setIcon(R.drawable.study);
-                study.setBackground(new ColorDrawable(Color.parseColor("#FFFFB6C1")));
+//                study.setBackground(new ColorDrawable(Color.parseColor("#FFFFB6C1")));
                 menu.addMenuItem(study);
-                SwipeMenuItem voca = new SwipeMenuItem(HomeActivity.this);
+                SwipeMenuItem voca = new SwipeMenuItem(getApplicationContext());
                 voca.setWidth(dp2px(90));
-                voca.setBackground(new ColorDrawable(Color.parseColor("#FFFFFFFF")));
+//                voca.setBackground(new ColorDrawable(Color.parseColor("#FFFFFFFF")));
                 voca.setIcon(R.drawable.voca);
                 menu.addMenuItem(voca);
             }
@@ -85,16 +87,38 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
             public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
                 switch (index) {
                     case 0:
-                        if(arrayList.contains("No Dialog")){
+                        if(arrayList.contains(" \nNo Dialog\n ")){
                             Toast.makeText(HomeActivity.this, "학습할 자료가 없습니다.", Toast.LENGTH_SHORT).show();
                         }
-                        else startActivity(STTS_intent);
+                        else {
+                            Log.d(TAG, String.valueOf(position));
+                            switch (position){
+                                case 0: data.setData("s1");break;
+                                case 1: data.setData("s2");break;
+                                case 2: data.setData("d");break;
+                            }
+                            STTS_intent.putExtra("data",(Parcelable)data);
+                            startActivity(STTS_intent);
+                        }
                         break;
                     case 1:
-                        if(arrayList.contains("No Dialog")){
+                        if(arrayList.contains(" \nNo Dialog\n ")){
                             Toast.makeText(HomeActivity.this, "학습할 자료가 없습니다.", Toast.LENGTH_SHORT).show();
                         }
-                        else Toast.makeText(HomeActivity.this, "voca", Toast.LENGTH_SHORT).show();
+                        else {
+                            Log.d(TAG, String.valueOf(position));
+                            switch (position){
+                                case 0:
+                                    data.setData("s1");
+                                    Voca_intent.putExtra("data",(Parcelable)data);
+                                    startActivity(Voca_intent);break;
+                                case 1:
+                                    data.setData("s2");
+                                    Voca_intent.putExtra("data",(Parcelable)data);
+                                    startActivity(Voca_intent);break;
+                                case 2: Toast.makeText(HomeActivity.this, "Dialog는 단어학습이 없습니다.", Toast.LENGTH_SHORT).show();break;
+                            }
+                        }
                         break;
                 }
                 return true;
@@ -132,13 +156,13 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
                                 arrayList.add("Script #1\n"+document.get("smain1kor").toString());
                                 arrayList.add("Script #2\n"+document.get("smain2kor").toString());
                                 arrayList.add("Dialog\n"+document.get("dmainkor").toString());
-                                STTS_intent.putExtra("date",today);
+                                data.setDate(today);
                             } else {
                                 Log.d(TAG, "Error getting documents: ", task.getException());
                                 Toast.makeText(HomeActivity.this, today+"\n공부할 내용이 없습니다.", Toast.LENGTH_SHORT).show();
-                                arrayList.add("\nNo Script #1\n");
-                                arrayList.add("\nNo Script #2\n");
-                                arrayList.add("\nNo Dialog\n");
+                                arrayList.add(" \nNo Script #1\n ");
+                                arrayList.add(" \nNo Script #2\n ");
+                                arrayList.add(" \nNo Dialog\n ");
                             }
                             listAdapter.notifyDataSetChanged();
                         }
@@ -164,11 +188,11 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
                                         arrayList.add("Script #1\n"+document.get("smain1kor").toString());
                                         arrayList.add("Script #2\n"+document.get("smain2kor").toString());
                                         arrayList.add("Dialog\n"+document.get("dmainkor").toString());
-                                        STTS_intent.putExtra("date",date);
+                                        data.setDate(date);
                                     } else {
-                                        arrayList.add("\nNo Script #1\n");
-                                        arrayList.add("\nNo Script #2\n");
-                                        arrayList.add("\nNo Dialog\n");
+                                        arrayList.add(" \nNo Script #1\n ");
+                                        arrayList.add(" \nNo Script #2\n ");
+                                        arrayList.add(" \nNo Dialog\n ");
                                         Log.d(TAG, "Error getting documents: ", task.getException());
                                         Toast.makeText(HomeActivity.this, date+"\n공부할 내용이 없습니다.", Toast.LENGTH_SHORT).show();
                                     }
@@ -231,6 +255,7 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
         public long getItemId(int i) {
             return 0;
         }
+
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if(convertView==null){
