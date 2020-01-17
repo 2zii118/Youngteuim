@@ -210,7 +210,7 @@ public class ScriptActivity extends AppCompatActivity {
             if(intent.getAction().equals("get_stt_result")) {
                 ArrayList<String> results = intent.getStringArrayListExtra("result");
                 cnt1++;
-                Point point=stringSimilar.stringsSimilar(results.get(0).trim(),stringe[cnt1]);
+                Point point=stringSimilar.stringsSimilar(results.get(0).trim(),stringe[cnt1].trim());
                 liststt.add(results.get(0)+"\n점수 : "+point.getS());
                 adapterstt.notifyDataSetChanged();
                 unregisterReceiver(myBroadCastReceiver);

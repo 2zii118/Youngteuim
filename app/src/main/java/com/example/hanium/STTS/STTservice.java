@@ -35,7 +35,7 @@ public class STTservice extends Service implements RecognitionListener {
 
         intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getPackageName());
-        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "ko-KR");
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "en-US");
         speechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
         speechRecognizer.setRecognitionListener(this);
     }
