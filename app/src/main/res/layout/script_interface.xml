@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="fill_parent"
+    android:layout_width="fill_parent"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/scripttool"
+        android:layout_width="fill_parent"
+        android:background="#FFB0E0E6"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="30dp"
+            android:textColor="#FFFFFFFF"/>
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <ListView
+        android:id="@+id/script"
+        android:layout_width="fill_parent"
+        android:layout_height="289dp"
+        android:layout_weight="1"
+        android:background="@drawable/rectangle_under_mint"
+        android:paddingLeft="5sp"
+        android:text="script~"
+        android:textColor="#FF000000"
+        android:textSize="20dp" />
+
+    <ListView
+        android:id="@+id/scriptrepeat"
+        android:layout_width="fill_parent"
+        android:layout_height="246dp"
+        android:layout_weight="1"
+        android:background="@drawable/rectangle_under"
+        android:paddingLeft="5sp"
+        android:text="sentence1"
+        android:textColor="#FF000000"
+        android:textSize="20dp" />
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:padding="3dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/allListenbt"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:background="#FFFFB6C1"
+            android:textSize="22dp"
+            android:layout_height="fill_parent"
+            android:text="전체듣기" />
+        <Button
+            android:id="@+id/Listenbt"
+            android:layout_width="wrap_content"
+            android:layout_weight="1"
+            android:background="#FFFFB6C1"
+            android:textSize="22dp"
+            android:layout_height="fill_parent"
+            android:text="#1 듣기" />
+
+        <Button
+            android:id="@+id/repeatbt"
+            android:textSize="22dp"
+            android:layout_weight="1"
+            android:background="#FFFFB6C1"
+            android:textColor="#FFFFFFFF"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:text="#1 따라하기" />
+
+    </LinearLayout>
+
+
+</LinearLayout>
+
+
