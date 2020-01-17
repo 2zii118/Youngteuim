@@ -112,7 +112,6 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
                                     Chat_intent.putExtra("data",(Parcelable)data);
                                     startActivity(Chat_intent);break;
                             }
-
                         }
                         break;
                     case 1:

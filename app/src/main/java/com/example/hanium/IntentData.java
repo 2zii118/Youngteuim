@@ -18,7 +18,6 @@ public class IntentData implements Serializable, Parcelable {
         date= in.readString();
         data = in.readString();
     }
-
     public static final Creator<IntentData> CREATOR = new Creator<IntentData>() {
         @Override
         public IntentData createFromParcel(Parcel in) {

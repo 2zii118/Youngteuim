@@ -16,7 +16,6 @@ public class stringSimilar {
         point.setData(similarity1,similarity2,similarity3,similarity4,similarity);
         return point;
     }
-
     public static int getLevenshteinDistance(String s1, String s2) {
         int[][] d = new int[s1.length() + 1][s2.length() + 1];
 

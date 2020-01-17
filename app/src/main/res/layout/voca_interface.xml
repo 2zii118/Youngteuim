@@ -17,7 +17,6 @@
             android:textColor="#FFFFFFFF"/>
 
     </androidx.appcompat.widget.Toolbar>
-
     <ListView
         android:id="@+id/vocalist"
         android:layout_width="fill_parent"

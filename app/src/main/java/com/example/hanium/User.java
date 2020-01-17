@@ -43,7 +43,6 @@ public class User implements Serializable, Parcelable {
                 });
 
     }
-
     protected User(Parcel in) {
         id = in.readString();
         name = in.readString();

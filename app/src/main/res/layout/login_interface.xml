@@ -83,7 +83,6 @@
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
         android:orientation="vertical">
-
         <Button
             android:layout_gravity="center_horizontal"
             android:layout_width="250dp"
