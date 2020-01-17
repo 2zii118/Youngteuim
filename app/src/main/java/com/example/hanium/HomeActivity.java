@@ -287,5 +287,3 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
         }
     }
 }
-
-

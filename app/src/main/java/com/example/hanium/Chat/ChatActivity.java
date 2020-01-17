@@ -50,7 +50,7 @@ public class ChatActivity extends AppCompatActivity {
     private boolean side = false;
     private TextToSpeech tts;
     private boolean isAvailableToTTS = false;
-
+    int check=0;
     private Intent STTservice;
     private MyBroadcastReceiver myBroadCastReceiver;
 
@@ -82,14 +82,14 @@ public class ChatActivity extends AppCompatActivity {
                             DocumentSnapshot document = task.getResult();
                             if (document.exists()) {
                               if(data.equals("d")){
-                                    aeng[0]=document.get("a1eng").toString();
-                                    aeng[1]=document.get("a2eng").toString();
-                                    beng[0]=document.get("b1eng").toString();
-                                    beng[1]=document.get("b2eng").toString();
-                                    akor[0]=document.get("a1kor").toString();
-                                    akor[1]=document.get("a2kor").toString();
-                                    bkor[0]=document.get("b1kor").toString();
-                                    bkor[1]=document.get("b2kor").toString();
+                                    aeng[0]=document.get("a1eng").toString().trim() ;
+                                    aeng[1]=document.get("a2eng").toString().trim();
+                                    beng[0]=document.get("b1eng").toString().trim();
+                                    beng[1]=document.get("b2eng").toString().trim();
+                                    akor[0]=document.get("a1kor").toString().trim();
+                                    akor[1]=document.get("a2kor").toString().trim();
+                                    bkor[0]=document.get("b1kor").toString().trim();
+                                    bkor[1]=document.get("b2kor").toString().trim();
                                 }
 
                             } else {
@@ -156,6 +156,7 @@ public class ChatActivity extends AppCompatActivity {
         buttonSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d(TAG,Integer.toString(check));
                 if (cnt>=4) {
                     Toast.makeText(ChatActivity.this, "학습을 완료하였습니다.", Toast.LENGTH_SHORT).show();
                         buttonSend.setText("<   학습 완료   >");
@@ -210,12 +211,13 @@ public class ChatActivity extends AppCompatActivity {
                         public void onDone(String s) {
                             Log.d(TAG, "TTS On Done");
 
-
+                            check++;
                         }
 
                         @Override
                         public void onError(String s) {
                             Log.d(TAG, "TTS On Error");
+
 
                         }
                     });

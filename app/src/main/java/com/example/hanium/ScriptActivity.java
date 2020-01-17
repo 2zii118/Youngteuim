@@ -209,14 +209,13 @@ public class ScriptActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             if(intent.getAction().equals("get_stt_result")) {
                 ArrayList<String> results = intent.getStringArrayListExtra("result");
-                liststt.add(results.get(0));
                 cnt1++;
-                Point point=stringSimilar.stringsSimilar(results.get(0),stringe[cnt1]);
+                Point point=stringSimilar.stringsSimilar(results.get(0).trim(),stringe[cnt1]);
                 liststt.add(results.get(0)+"\n점수 : "+point.getS());
                 adapterstt.notifyDataSetChanged();
                 unregisterReceiver(myBroadCastReceiver);
-                bt.setText(" #"+(cnt1+1)+" 듣기");
-                if((cnt1-1)>=stringe.length)cnt1=-1;
+                repeatbt.setText(" #"+(cnt1+1)+" 따라하기");
+                if((cnt1+1)>=stringe.length)cnt1=-1;
 
                 if(STTservice != null) {
                     stopService(STTservice);

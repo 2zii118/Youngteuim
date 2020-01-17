@@ -2,8 +2,9 @@ package com.example.hanium;
 
 public class stringSimilar {
 
+
     public static Point stringsSimilar(String s1, String s2) {
-        Point point=new Point();
+        Point point = new Point();
         int characterChanges = getLevenshteinDistance(s1, s2);
         int wordChanges = getWordChanges(s1, s2);
         int characterCountChange = Math.abs(s1.length() - s2.length());
@@ -12,10 +13,13 @@ public class stringSimilar {
         int similarity2 = 100 - wordChanges * 100 / (s1.split(" ").length > s2.split(" ").length ? s1.split(" ").length : s2.split(" ").length);
         int similarity3 = 100 - characterCountChange * 100 / s1.length();
         int similarity4 = 100 - wordCountChange * 100 / s1.split(" ").length;
-        int similarity = (int) Math.round(similarity1 + similarity2*2 + similarity3 + similarity4) / 5;
-        point.setData(similarity1,similarity2,similarity3,similarity4,similarity);
+        int similarity = (int) Math.round(similarity1 + similarity2 * 2 + similarity3 + similarity4) / 5;
+
+        point.setData(similarity1, similarity2, similarity3, similarity4, similarity);
         return point;
+
     }
+
     public static int getLevenshteinDistance(String s1, String s2) {
         int[][] d = new int[s1.length() + 1][s2.length() + 1];
 
@@ -69,8 +73,8 @@ public class stringSimilar {
         return wordChanges;
     }
 
-    private static int getMinimum( int i, int j, int k ) {
-        if( i < j ) return i < k ? i : k;
+    private static int getMinimum(int i, int j, int k) {
+        if (i < j) return i < k ? i : k;
         else return j < k ? j : k;
     }
 }
