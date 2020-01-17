@@ -12,7 +12,7 @@
         android:orientation="vertical">
         <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="50dp"
+            android:layout_height="40dp"
             android:orientation="horizontal"
             android:background="@drawable/rectangle_under_mint">
             <Button
@@ -21,21 +21,24 @@
                 android:layout_height="match_parent"
                 android:layout_weight="0"
                 android:background="#FFB0E0E6"
-                android:text="="/>
+                android:text="="
+                android:textSize="20dp"/>
 
             <TextView
                 android:layout_width="fill_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
-                android:text="youngAI"
-                android:textSize="30dp"
-               android:gravity="center_horizontal" />
+                android:gravity="center_horizontal"
+                android:text="YoungAI"
+                android:textAlignment="center"
+                android:textSize="20dp" />
             <Button
                 android:layout_width="50dp"
                 android:layout_height="match_parent"
                 android:background="#FFB0E0E6"
                 android:layout_weight="0"
-                android:text="o"/>
+                android:text="o"
+                android:textSize="15dp"/>
         </LinearLayout>
 
         <CalendarView
@@ -49,7 +52,8 @@
         <com.baoyz.swipemenulistview.SwipeMenuListView
             android:id="@+id/listView"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:textSize="10dp"/>
 
     </LinearLayout>
 
