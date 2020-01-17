@@ -86,8 +86,9 @@ public class ScriptActivity extends AppCompatActivity {
                                 }
                                 stringe=seng.split("\\.");
                                 stringk=skor.split("\\.");
+                                Log.d(TAG,stringe.length+","+stringk.length);
                                 for(int i=0;i<stringe.length;i++){
-                                    list.add(" #"+(i+1)+"  "+stringe[i]+'\n'+stringk[i]);
+                                    list.add(" #"+(i+1)+"  "+stringe[i]);
                                     Log.d(TAG,Integer.toString(i));
                                 }
 
