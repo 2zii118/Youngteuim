@@ -29,7 +29,6 @@ import com.baoyz.swipemenulistview.SwipeMenuItem;
 import com.baoyz.swipemenulistview.SwipeMenuListView;
 import com.example.hanium.Chat.ChatActivity;
 import com.example.hanium.Login.LoginActivity;
-import com.example.hanium.STTS.STTSActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -58,7 +57,7 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setContentView(R.layout.home_interface);
-        final Intent STTS_intent = new Intent(HomeActivity.this, STTSActivity.class);
+        final Intent Script_intent = new Intent(HomeActivity.this, ScriptActivity.class);
         final Intent Voca_intent = new Intent(HomeActivity.this, VocaActivity.class);
         final Intent Chat_intent = new Intent(HomeActivity.this, ChatActivity.class);
         listView = (SwipeMenuListView) findViewById(R.id.listView);
@@ -102,12 +101,12 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
                             switch (position){
                                 case 0:
                                     data.setData("s1");
-                                    STTS_intent.putExtra("data",(Parcelable)data);
-                                    startActivity(STTS_intent);break;
+                                    Script_intent.putExtra("data",(Parcelable)data);
+                                    startActivity(Script_intent);break;
                                 case 1:
                                     data.setData("s2");
-                                    STTS_intent.putExtra("data",(Parcelable)data);
-                                    startActivity(STTS_intent);break;
+                                    Script_intent.putExtra("data",(Parcelable)data);
+                                    startActivity(Script_intent);break;
                                 case 2:
                                     data.setData("d");
                                     Chat_intent.putExtra("data",(Parcelable)data);

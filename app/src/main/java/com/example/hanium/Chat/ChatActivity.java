@@ -21,7 +21,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.example.hanium.IntentData;
+import com.example.hanium.Point;
 import com.example.hanium.R;
+import com.example.hanium.stringSimilar;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -175,8 +177,9 @@ public class ChatActivity extends AppCompatActivity {
     //                    registerReceiver(myBroadCastReceiver, intentFilter);
     //                    STTservice = new Intent(ChatActivity.this, com.example.hanium.STTS.STTservice.class);
     //                    startService(STTservice);
+                            Point point=stringSimilar.stringsSimilar(beng[nowIndex-1],"hello");
                             sendChatMessage("일단 패스");
-                            sendChatMessage("점수");
+                            sendChatMessage(Integer.toString(point.getS()));
                             buttonSend.setText("<   다음 문장   >");
 
                     }

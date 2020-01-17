@@ -56,7 +56,8 @@ public class ChatArrayAdapter extends ArrayAdapter {
         chatText.setText(chatMessageObj.message);
         //chatText.setTextColor();
         if(position%3==2){
-            chatText.setBackgroundColor(Color.parseColor("#FFFFB6C1"));
+            chatText.setBackgroundColor(Color.parseColor("#FFFFFFFF"));
+            chatText.setTextColor(Color.BLACK);
             singleMessageContainer.setGravity(Gravity.RIGHT);
         }
         else if(position%3==0){

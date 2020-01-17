@@ -19,6 +19,7 @@
         <activity android:name=".HomeActivity"/>
         <activity android:name=".VocaActivity"/>
         <activity android:name=".Chat.ChatActivity"/>
+        <activity android:name=".ScriptActivity"/>
         <activity android:name=".Login.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
