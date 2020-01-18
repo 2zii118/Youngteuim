@@ -175,7 +175,7 @@ public class ChatActivity extends AppCompatActivity {
                     if(step%2==0) {
                         for (cnt = 0; cnt <= 9; cnt = cnt + 2) {
                             if (keyArray[cnt].startsWith("a" + chatnum) && (check == true)) {
-                                sendChatMessage(map.get(keyArray[cnt]) + "\n" + map.get(keyArray[cnt + 1]));
+                                sendChatMessage(1,map.get(keyArray[cnt]).replace(". ",".\n") + "\n" + map.get(keyArray[cnt + 1]).replace(". ",".\n"));
                                 speech(map.get(keyArray[cnt]));
                                 check = (!check);
                                 buttonSend.setText("<   Next   >");
@@ -185,7 +185,7 @@ public class ChatActivity extends AppCompatActivity {
                     else {
                         for (cnt = 0; cnt <= 9; cnt = cnt + 2) {
                             if ((keyArray[cnt].startsWith("b" + chatnum)) && check == false) {
-                                sendChatMessage(map.get(keyArray[cnt]));
+                                sendChatMessage(2,map.get(keyArray[cnt]).replace(". ",".\n"));
                                 mHandler.postDelayed(mMyTask, 1000);
                                 myBroadCastReceiver = new MyBroadcastReceiver();
                                 IntentFilter intentFilter = new IntentFilter();
@@ -253,10 +253,9 @@ public class ChatActivity extends AppCompatActivity {
     }
 
 
-    private boolean sendChatMessage(String text) {
+    private boolean sendChatMessage(int side, String text) {
         chatArrayAdapter.add(new ChatMessage(side, text));
         //chatArrayAdapter.notifyDataSetChanged();
-        side = !side;
         return true;
     }
     @Override
@@ -279,9 +278,9 @@ public class ChatActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             if(intent.getAction().equals("get_stt_result")) {
                 ArrayList<String> results = intent.getStringArrayListExtra("result");
-                sendChatMessage(results.get(0));
+                sendChatMessage(3,results.get(0));
                 point= stringSimilar.stringsSimilar(map.get(keyArray[checkpoint]),results.get(0));
-                sendChatMessage(Integer.toString(point.getS()));
+                sendChatMessage(3,Integer.toString(point.getS()));
                 unregisterReceiver(myBroadCastReceiver);
                 if(STTservice != null) {
                     stopService(STTservice);
