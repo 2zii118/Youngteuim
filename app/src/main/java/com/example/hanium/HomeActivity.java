@@ -68,6 +68,7 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
         Log.d(TAG, user.getId());
         listAdapter=new ListDataAdapter();
         listView.setAdapter(listAdapter);
+
         SwipeMenuCreator creator = new SwipeMenuCreator() {
             @Override
             public void create(SwipeMenu menu) {

@@ -4,8 +4,10 @@ import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.DataSetObserver;
 import android.os.Bundle;
+import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.util.Log;
@@ -32,8 +34,12 @@ import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 public class ChatActivity extends AppCompatActivity {
     private static final String TAG = "ChatActivity";
@@ -45,14 +51,23 @@ public class ChatActivity extends AppCompatActivity {
     String date,data;
     String[] aeng,akor,bkor,beng;
     Toolbar toolbar;
-    int nowIndex=0;
+    int checkpoint=0;
     int cnt=0;
     private boolean side = false;
     private TextToSpeech tts;
     private boolean isAvailableToTTS = false;
-    int check=0;
+
     private Intent STTservice;
     private MyBroadcastReceiver myBroadCastReceiver;
+    Handler mHandler = new Handler();
+
+    //kde
+    LinkedHashMap<String, String> map = new LinkedHashMap<>();
+    int keynum, chatnum;
+    boolean check=true;
+    static String[] keyArray;
+    int step = 0;
+    Point point;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -63,15 +78,12 @@ public class ChatActivity extends AppCompatActivity {
         date=intentdata.getDate();
         data=intentdata.getData();
 
-        aeng=new String[2];
-        beng=new String[2];
-        akor=new String[2];
-        bkor=new String[2];
 
         toolbar=(Toolbar)findViewById(R.id.chattool);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setTitle("Dialog");
+
 
         db.collection("sentence").document(date)
                 .get()
@@ -80,24 +92,25 @@ public class ChatActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                         if (task.isSuccessful()) {
                             DocumentSnapshot document = task.getResult();
+                            keyArray = document.getData().keySet().toArray(new String[document.getData().keySet().size()]);
+                            Arrays.sort(keyArray);
                             if (document.exists()) {
-                              if(data.equals("d")){
-                                    aeng[0]=document.get("a1eng").toString().trim() ;
-                                    aeng[1]=document.get("a2eng").toString().trim();
-                                    beng[0]=document.get("b1eng").toString().trim();
-                                    beng[1]=document.get("b2eng").toString().trim();
-                                    akor[0]=document.get("a1kor").toString().trim();
-                                    akor[1]=document.get("a2kor").toString().trim();
-                                    bkor[0]=document.get("b1kor").toString().trim();
-                                    bkor[1]=document.get("b2kor").toString().trim();
+                                if(data.equals("d")){
+                                    //Log.d(TAG, document.getData().toString());
+                                    keynum=0;
+                                    while(keynum<keyArray.length) {
+                                        map.put(keyArray[keynum],document.get(keyArray[keynum]).toString().trim());
+                                        keynum = keynum+1;
+                                    }
+                                    Log.d(TAG,"key 값: "+map.keySet()+" value 값: "+map.values());
                                 }
-
                             } else {
 
                                 Log.d(TAG, "Error getting documents: ", task.getException());
 
                             }
                         }
+
                     }
                 });
         TedPermission.with(this)
@@ -119,14 +132,10 @@ public class ChatActivity extends AppCompatActivity {
                 })
                 .check();
 
-        //buttonSend = (Button) findViewById(R.id.buttonSend);
-
         listView = (ListView) findViewById(R.id.listView1);
 
         chatArrayAdapter = new ChatArrayAdapter(getApplicationContext(), R.layout.activity_chat_singlemessage);
         listView.setAdapter(chatArrayAdapter);
-
-
 
         listView.setTranscriptMode(AbsListView.TRANSCRIPT_MODE_ALWAYS_SCROLL);
         listView.setAdapter(chatArrayAdapter);
@@ -143,53 +152,60 @@ public class ChatActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()){
-            case android.R.id.home:{
-                finish();
+            case android.R.id.home:{onBeginningOfSpeech:
+            finish();
                 return true;
             }
         }
         return super.onOptionsItemSelected(item);
     }
+
     public void initView(){
+        chatnum=1;
+
         buttonSend = (Button) findViewById(R.id.buttonSend);
-        buttonSend.setText("<   시작하기   >");
         buttonSend.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d(TAG,Integer.toString(check));
-                if (cnt>=4) {
+                if(step>=4&&chatnum==3){
                     Toast.makeText(ChatActivity.this, "학습을 완료하였습니다.", Toast.LENGTH_SHORT).show();
-                        buttonSend.setText("<   학습 완료   >");
-                    }
-                else{
-                    if(cnt%2==0) {
-                        String txt = aeng[nowIndex];
-                        String kor=akor[nowIndex];
-                        Log.d(TAG, "시작");
-                        speech(txt);
-                        sendChatMessage(txt+"\n"+kor);
-                        buttonSend.setText("<   말하기   >");
-                        nowIndex++;
-                    }
-                    else{
-    //                    myBroadCastReceiver = new MyBroadcastReceiver();
-    //                    IntentFilter intentFilter = new IntentFilter();
-    //                    intentFilter.addAction("get_stt_result");
-    //                    registerReceiver(myBroadCastReceiver, intentFilter);
-    //                    STTservice = new Intent(ChatActivity.this, com.example.hanium.STTS.STTservice.class);
-    //                    startService(STTservice);
-                            Point point=stringSimilar.stringsSimilar(beng[nowIndex-1],"hello");
-                            sendChatMessage("일단 패스");
-                            sendChatMessage(Integer.toString(point.getS()));
-                            buttonSend.setText("<   다음 문장   >");
-
-                    }
-                    cnt++;
+                    buttonSend.setText("<   학습 완료   >");
                 }
+                else{
+                    if(step%2==0) {
+                        for (cnt = 0; cnt <= 9; cnt = cnt + 2) {
+                            if (keyArray[cnt].startsWith("a" + chatnum) && (check == true)) {
+                                sendChatMessage(1,map.get(keyArray[cnt]).replace(". ",".\n") + "\n" + map.get(keyArray[cnt + 1]).replace(". ",".\n"));
+                                speech(map.get(keyArray[cnt]));
+                                check = (!check);
+                                buttonSend.setText("<   Next   >");
+                            }
+                        }
+                    }
+                    else {
+                        for (cnt = 0; cnt <= 9; cnt = cnt + 2) {
+                            if ((keyArray[cnt].startsWith("b" + chatnum)) && check == false) {
+                                sendChatMessage(2,map.get(keyArray[cnt]).replace(". ",".\n"));
+                                mHandler.postDelayed(mMyTask, 1000);
+                                myBroadCastReceiver = new MyBroadcastReceiver();
+                                IntentFilter intentFilter = new IntentFilter();
+                                intentFilter.addAction("get_stt_result");
+                                registerReceiver(myBroadCastReceiver, intentFilter);
+                                STTservice = new Intent(ChatActivity.this, com.example.hanium.STTS.STTservice.class);
+                                startService(STTservice);
+                                checkpoint=cnt;
+                                chatnum = chatnum + 1;
+                                check = (!check);
+                                buttonSend.setText("<   Next   >");
+                            }
+                        }
+                    }
+                    step++;
+
+                }
+
             }
         });
-
-
         tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int isAvailable) {
@@ -211,13 +227,12 @@ public class ChatActivity extends AppCompatActivity {
                         public void onDone(String s) {
                             Log.d(TAG, "TTS On Done");
 
-                            check++;
+
                         }
 
                         @Override
                         public void onError(String s) {
                             Log.d(TAG, "TTS On Error");
-
 
                         }
                     });
@@ -225,21 +240,35 @@ public class ChatActivity extends AppCompatActivity {
             }
         });
     }
+    Runnable mMyTask = new Runnable() {
+        @Override
+        public void run() {
+            Toast.makeText(ChatActivity.this, "음성인식을 시작합니다.", Toast.LENGTH_SHORT).show();
+        }
+    };
     public void speech(String message) {
         if (isAvailableToTTS) {
-            tts.speak(message.trim(), TextToSpeech.QUEUE_FLUSH, null, TextToSpeech.ACTION_TTS_QUEUE_PROCESSING_COMPLETED);
+            tts.speak(message.trim(), TextToSpeech.QUEUE_ADD, null, TextToSpeech.ACTION_TTS_QUEUE_PROCESSING_COMPLETED);
         }
     }
 
-    private boolean sendChatMessage(String text) {
+
+    private boolean sendChatMessage(int side, String text) {
         chatArrayAdapter.add(new ChatMessage(side, text));
-        side = !side;
+        //chatArrayAdapter.notifyDataSetChanged();
         return true;
     }
     @Override
     protected void onDestroy() {
         if(STTservice != null) {
             stopService(STTservice);
+        }
+        if (tts != null) {
+
+            tts.stop();
+
+            tts.shutdown();
+
         }
         super.onDestroy();
     }
@@ -249,7 +278,9 @@ public class ChatActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             if(intent.getAction().equals("get_stt_result")) {
                 ArrayList<String> results = intent.getStringArrayListExtra("result");
-                sendChatMessage(results.toString());
+                sendChatMessage(3,results.get(0));
+                point= stringSimilar.stringsSimilar(map.get(keyArray[checkpoint]),results.get(0));
+                sendChatMessage(3,Integer.toString(point.getS()));
                 unregisterReceiver(myBroadCastReceiver);
                 if(STTservice != null) {
                     stopService(STTservice);

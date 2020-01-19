@@ -55,18 +55,18 @@ public class ChatArrayAdapter extends ArrayAdapter {
         chatText = (TextView) row.findViewById(R.id.singleMessage);
         chatText.setText(chatMessageObj.message);
         //chatText.setTextColor();
-        if(position%3==2){
+        if(chatMessageObj.left==3){ //stt & 점수
             chatText.setBackgroundColor(Color.parseColor("#FFFFFFFF"));
             chatText.setTextColor(Color.BLACK);
             singleMessageContainer.setGravity(Gravity.RIGHT);
         }
-        else if(position%3==0){
+        else if(chatMessageObj.left==1){//컴퓨터가 하는 문장
             chatText.setBackgroundResource( R.drawable.bubble_com); //이미지 번갈아 출력
             singleMessageContainer.setGravity(Gravity.LEFT); //좌측&우측정렬 번갈아 실행
         }
-        else{
-            chatText.setBackgroundResource(R.drawable.bubble_user); //이미지 번갈아 출력
-            singleMessageContainer.setGravity(Gravity.RIGHT ); //좌측&우측정렬 번갈아 실행
+        else if(chatMessageObj.left==2) { //사용자가 할 문장
+                chatText.setBackgroundResource(R.drawable.bubble_user); //이미지 번갈아 출력
+                singleMessageContainer.setGravity(Gravity.RIGHT); //좌측&우측정렬 번갈아 실행
         }
         return row;
     }
