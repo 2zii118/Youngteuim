@@ -85,6 +85,7 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:inputType="phone"
                 android:id="@+id/signup_phnum_Et"/>
         </LinearLayout>
 
@@ -102,7 +103,6 @@
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="phone"
                 android:id="@+id/signup_email_Et"/>
         </LinearLayout>
 

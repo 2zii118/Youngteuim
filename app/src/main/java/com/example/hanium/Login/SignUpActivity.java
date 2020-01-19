@@ -56,6 +56,7 @@ public class SignUpActivity extends AppCompatActivity {
                 user.put("NAME",nameEt.getText().toString());
                 user.put("Phone",phnumEt.getText().toString());
                 user.put("Email",emailEt.getText().toString());
+                user.put("Mark","");
                if(pwEt.getText().toString().length()*nameEt.getText().toString().length()*phnumEt.getText().toString().length()*emailEt.getText().toString().length()<=0)
                    Toast.makeText(SignUpActivity.this, "회원가입 실패\n모든 정보를 기입해주세요", Toast.LENGTH_SHORT).show();
                else {
