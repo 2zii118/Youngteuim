@@ -25,9 +25,13 @@ import androidx.appcompat.widget.Toolbar;
 import com.example.hanium.IntentData;
 import com.example.hanium.Point;
 import com.example.hanium.R;
+import com.example.hanium.User;
 import com.example.hanium.stringSimilar;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.gun0912.tedpermission.PermissionListener;
@@ -35,6 +39,7 @@ import com.gun0912.tedpermission.TedPermission;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -68,7 +73,9 @@ public class ChatActivity extends AppCompatActivity {
     static String[] keyArray;
     int step = 0;
     Point point;
-
+    User user;
+    //String[] study_record;
+    //Map<String, Object> record = new HashMap<>();
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,7 +84,7 @@ public class ChatActivity extends AppCompatActivity {
         intentdata = (IntentData) getIntent().getParcelableExtra("data");
         date=intentdata.getDate();
         data=intentdata.getData();
-
+        user = getIntent().getParcelableExtra("user");
 
         toolbar=(Toolbar)findViewById(R.id.chattool);
         setSupportActionBar(toolbar);
@@ -170,6 +177,21 @@ public class ChatActivity extends AppCompatActivity {
                 if(step>=4&&chatnum==3){
                     Toast.makeText(ChatActivity.this, "학습을 완료하였습니다.", Toast.LENGTH_SHORT).show();
                     buttonSend.setText("<   학습 완료   >");
+                    //record.put("check","done");
+                    DocumentReference chRef = db.collection("User").document(date);
+                    chRef.update("check","done")
+                            .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d(TAG, "DocumentSnapshot successfully updated!");
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.w(TAG, "Error updating document", e);
+                                }
+                            });
                 }
                 else{
                     if(step%2==0) {

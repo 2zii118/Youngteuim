@@ -14,13 +14,13 @@
             android:layout_width="fill_parent"
             android:layout_height="40dp"
             android:orientation="horizontal"
-            android:background="@drawable/rectangle_under_mint">
+            android:background="#FFFFFF">
             <Button
                 android:id="@+id/my_bar"
                 android:layout_width="50dp"
                 android:layout_height="match_parent"
                 android:layout_weight="0"
-                android:background="#FFB0E0E6"
+                android:background="#FFFFFF"
                 android:text="="
                 android:textSize="20dp"/>
 
@@ -35,19 +35,19 @@
             <Button
                 android:layout_width="50dp"
                 android:layout_height="match_parent"
-                android:background="#FFB0E0E6"
+                android:background="#FFFFFF"
                 android:layout_weight="0"
                 android:text="o"
                 android:textSize="15dp"/>
         </LinearLayout>
 
-        <CalendarView
+        <com.prolificinteractive.materialcalendarview.MaterialCalendarView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/Calendar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/rectangle_under_mint"
-            android:showWeekNumber="false"
-            android:theme="@style/CalenderTheme"/>
+            app:mcv_selectionColor="#a9dbf0cb"
+            app:mcv_showOtherDates="defaults" />
 
         <com.baoyz.swipemenulistview.SwipeMenuListView
             android:id="@+id/listView"

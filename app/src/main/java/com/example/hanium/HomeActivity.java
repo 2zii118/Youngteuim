@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.Log;
@@ -33,12 +34,24 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
+import com.prolificinteractive.materialcalendarview.CalendarDay;
+import com.prolificinteractive.materialcalendarview.CalendarMode;
+import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
+import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 
+import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.concurrent.Executors;
 
+import static java.util.Calendar.SUNDAY;
 
 
 public class HomeActivity<listAdapter> extends AppCompatActivity {
@@ -51,8 +64,10 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
     private ArrayList<String> arrayList = new ArrayList<>();
     private ListDataAdapter listAdapter;
     IntentData data=new IntentData();
-    CalendarView cal;
+    MaterialCalendarView cal;
     User user;
+    String[] thing;
+    private final OneDayDecorator oneDayDecorator = new OneDayDecorator();
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
@@ -66,6 +81,7 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
 
         user = (User) getIntent().getParcelableExtra("user");
         Log.d(TAG, user.getId());
+
         listAdapter=new ListDataAdapter();
         listView.setAdapter(listAdapter);
 
@@ -159,6 +175,7 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
         });
         SimpleDateFormat sdf=new SimpleDateFormat("yyyy년MM월dd일");
         final String today=sdf.format(new Date());
+        Log.d(TAG,"날짜가 왜이럴깡: "+today);
         db.collection("sentence").document(today)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -182,42 +199,73 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
                         }
                     }
                 });
-        cal=(CalendarView)findViewById(R.id.Calendar);
-        cal.setOnDateChangeListener(new CalendarView.OnDateChangeListener() {
+        cal=(MaterialCalendarView)findViewById(R.id.Calendar);
+        cal.state().edit()
+                .setFirstDayOfWeek(SUNDAY)
+                .setCalendarDisplayMode(CalendarMode.MONTHS)
+                .commit();
+        cal.addDecorators(
+                new SundayDecorator(),
+                new SaturdayDecorator(),
+                oneDayDecorator);
+
+
+
+        cal.setOnDateChangedListener(new OnDateSelectedListener() {
             @Override
-            public void onSelectedDayChange(@NonNull CalendarView view, int year, int month, int dayOfMonth) {
-                NumberFormat nf=NumberFormat.getIntegerInstance();
-                nf.setMinimumIntegerDigits(2);
-                final String date=year+"년"+nf.format(month+1)+"월"+nf.format(dayOfMonth)+"일";
-                arrayList.clear();
-                Log.d(TAG,date);
-                db.collection("sentence").document(date)
-                        .get()
-                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    DocumentSnapshot document = task.getResult();
-                                    if (document.exists()) {
-                                        arrayList.add("Script #1\n"+document.get("smain1kor").toString());
-                                        arrayList.add("Script #2\n"+document.get("smain2kor").toString());
-                                        arrayList.add("Dialog\n"+document.get("dmainkor").toString());
-                                        data.setDate(date);
-                                    } else {
-                                        arrayList.add(" \nNo Script #1\n ");
-                                        arrayList.add(" \nNo Script #2\n ");
-                                        arrayList.add(" \nNo Dialog\n ");
-                                        Log.d(TAG, "Error getting documents: ", task.getException());
-                                        Toast.makeText(HomeActivity.this, date+"\n공부할 내용이 없습니다.", Toast.LENGTH_SHORT).show();
+            public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
+                {
+                    NumberFormat nf=NumberFormat.getIntegerInstance();
+                    nf.setMinimumIntegerDigits(2);
+                    final String selecdate=date.getYear()+"년"+nf.format((date.getMonth()+1))+"월"+nf.format(date.getDay())+"일";
+                    arrayList.clear();
+                    Log.d(TAG,"날짜 확인: "+selecdate+db.collection("sentence").document("2019년7월1일").get().toString());
+                    db.collection("sentence").document(selecdate)
+                            .get()
+                            .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                    if (task.isSuccessful()) {
+                                        DocumentSnapshot document = task.getResult();
+                                        if (document.exists()) {
+                                            arrayList.add("Script #1\n"+document.get("smain1kor").toString());
+                                            arrayList.add("Script #2\n"+document.get("smain2kor").toString());
+                                            arrayList.add("Dialog\n"+document.get("dmainkor").toString());
+                                            data.setDate(selecdate);
+                                        } else {
+                                            arrayList.add(" \nNo Script #1\n ");
+                                            arrayList.add(" \nNo Script #2\n ");
+                                            arrayList.add(" \nNo Dialog\n ");
+                                            Log.d(TAG, "Error getting documents: ", task.getException());
+                                            Toast.makeText(HomeActivity.this, selecdate+"\n공부할 내용이 없습니다.", Toast.LENGTH_SHORT).show();
+                                        }
+                                        listAdapter.notifyDataSetChanged();
                                     }
-                                    listAdapter.notifyDataSetChanged();
                                 }
-                            }
-                        });
+                            });
+                }
             }
         });
 
-
+        db.collection("sentence")
+                .whereEqualTo("check","done")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        List donedate = new ArrayList();
+                        if(task.isSuccessful()) {
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Log.d(TAG, "=>" + document.getId());
+                                donedate.add(document.getId());
+                                new ApiSimulator(donedate).executeOnExecutor(Executors.newSingleThreadExecutor());
+                            }
+                        }
+                        else{
+                            Log.d(TAG,"Error getting documents: ",task.getException());
+                        }
+                    }
+                });
 
         myBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -286,5 +334,82 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
         class ViewHolder {
             TextView mTextview;
         }
+    }
+
+    //달력 Dot
+    private class ApiSimulator extends AsyncTask<Void, Void, List<CalendarDay>> {
+
+        List study_record = new ArrayList();
+        ApiSimulator(List donedate){
+            this.study_record=donedate;
+        }
+
+        @Override
+        protected List<CalendarDay> doInBackground(@NonNull Void... voids) {
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            /*
+            db.collection("sentence")
+                    .whereEqualTo("check","done")
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if(task.isSuccessful()) {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    Log.d(TAG, "=>" + document.getId());
+                                    donedate.add(document.getId());
+                                    Calendar calendar = Calendar.getInstance();
+                                    DateFormat df = new SimpleDateFormat("yyyy년MM월dd일");
+                                    Date date = null;
+                                    try {
+                                        date = df.parse(document.getId());
+                                        Log.d(TAG,"점찍을 날짜 확인: "+date);
+                                    } catch(ParseException e){
+                                        e.printStackTrace();
+                                    }
+                                    calendar.setTime(date);
+                                    calendar.add(Calendar.MONTH,+1);
+                                    CalendarDay day = CalendarDay.from(calendar);
+                                    dates.add(day);
+                                    }
+                                Log.d(TAG,"calendar day 리스트 확인: "+dates);
+                                }
+                            else{
+                                Log.d(TAG,"Error getting documents: ",task.getException());
+                            }
+                        }
+                    });*/
+            ArrayList<CalendarDay> dates = new ArrayList<>();
+            Calendar calendar = Calendar.getInstance();
+            DateFormat df = new SimpleDateFormat("yyyy년MM월dd일");
+            Date date = null;
+            for(int i =0; i<study_record.size();i++) {
+                try {
+                    date = df.parse(study_record.get(i).toString());
+                    Log.d(TAG,"점찍을 날짜 확인: "+date);
+                } catch(ParseException e){
+                    e.printStackTrace();
+                }
+                calendar.setTime(date);
+                CalendarDay day = CalendarDay.from(calendar);
+                dates.add(day);
+            }
+            return dates;
+        }
+
+        @Override
+        protected void onPostExecute(@NonNull List<CalendarDay> calendarDays) {
+            super.onPostExecute(calendarDays);
+
+            if (isFinishing()) {
+                return;
+            }
+
+            cal.addDecorator(new EventDecorator(Color.RED, calendarDays,HomeActivity.this));        }
     }
 }
