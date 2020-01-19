@@ -46,7 +46,7 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
     private static final String TAG = "HomeActivity";
     Button myBtn, mback;
     TextView Mname;
-    TextView Mlogout;
+    TextView Mlogout,markbt;
     private SwipeMenuListView listView;
     private ArrayList<String> arrayList = new ArrayList<>();
     private ListDataAdapter listAdapter;
@@ -65,6 +65,7 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
         myBtn = (Button) findViewById(R.id.my_bar);
 
         user = (User) getIntent().getParcelableExtra("user");
+        user.updateMark();
         Log.d(TAG, user.getId());
         listAdapter=new ListDataAdapter();
         listView.setAdapter(listAdapter);
@@ -86,6 +87,13 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
                 voca.setTitleSize(18);;
                 voca.setBackground(new ColorDrawable(Color.parseColor("#FFFFFFFF")));
                 menu.addMenuItem(voca);
+                SwipeMenuItem mark = new SwipeMenuItem(getApplicationContext());
+                mark.setWidth(dp2px(90));
+                mark.setTitleColor(Color.parseColor("#FFFFFFFF"));
+                mark.setTitle("mark");
+                mark.setTitleSize(18);;
+                mark.setBackground(new ColorDrawable(Color.parseColor("#FFFFB6C1")));
+                menu.addMenuItem(mark);
             }
         };
         listView.setMenuCreator(creator);
@@ -94,44 +102,94 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
             public boolean onMenuItemClick(int position, SwipeMenu menu, int index) {
                 switch (index) {
                     case 0:
-                        if(arrayList.contains(" \nNo Dialog\n ")){
-                            Toast.makeText(HomeActivity.this, "학습할 자료가 없습니다.", Toast.LENGTH_SHORT).show();
-                        }
-                        else {
+                        if (arrayList.contains(" \nNo Dialog\n ")) {
+                            Toast.makeText(HomeActivity.this, "학습 자료가 없습니다.", Toast.LENGTH_SHORT).show();
+                        } else {
                             Log.d(TAG, String.valueOf(position));
-                            switch (position){
+                            switch (position) {
                                 case 0:
                                     data.setData("s1");
-                                    Script_intent.putExtra("data",(Parcelable)data);
-                                    startActivity(Script_intent);break;
+                                    Script_intent.putExtra("data", (Parcelable) data);
+                                    startActivity(Script_intent);
+                                    break;
                                 case 1:
                                     data.setData("s2");
-                                    Script_intent.putExtra("data",(Parcelable)data);
-                                    startActivity(Script_intent);break;
+                                    Script_intent.putExtra("data", (Parcelable) data);
+                                    startActivity(Script_intent);
+                                    break;
                                 case 2:
                                     data.setData("d");
-                                    Chat_intent.putExtra("data",(Parcelable)data);
-                                    startActivity(Chat_intent);break;
+                                    Chat_intent.putExtra("data", (Parcelable) data);
+                                    startActivity(Chat_intent);
+                                    break;
                             }
                         }
                         break;
                     case 1:
-                        if(arrayList.contains(" \nNo Dialog\n ")){
-                            Toast.makeText(HomeActivity.this, "학습할 자료가 없습니다.", Toast.LENGTH_SHORT).show();
-                        }
-                        else {
+                        if (arrayList.contains(" \nNo Dialog\n ")) {
+                            Toast.makeText(HomeActivity.this, "학습 자료가 없습니다.", Toast.LENGTH_SHORT).show();
+                        } else {
                             Log.d(TAG, String.valueOf(position));
-                            switch (position){
+                            switch (position) {
                                 case 0:
                                     data.setData("s1");
-                                    Voca_intent.putExtra("data",(Parcelable)data);
-                                    startActivity(Voca_intent);break;
+                                    Voca_intent.putExtra("data", (Parcelable) data);
+                                    startActivity(Voca_intent);
+                                    break;
                                 case 1:
                                     data.setData("s2");
-                                    Voca_intent.putExtra("data",(Parcelable)data);
-                                    startActivity(Voca_intent);break;
-                                case 2: Toast.makeText(HomeActivity.this, "Dialog는 단어학습이 없습니다.", Toast.LENGTH_SHORT).show();break;
+                                    Voca_intent.putExtra("data", (Parcelable) data);
+                                    startActivity(Voca_intent);
+                                    break;
+                                case 2:
+                                    Toast.makeText(HomeActivity.this, "Dialog는 단어학습이 없습니다.", Toast.LENGTH_SHORT).show();
+                                    break;
                             }
+                        }
+                        break;
+                    case 2:
+                        if (arrayList.contains(" \nNo Dialog\n ")) {
+                            Toast.makeText(HomeActivity.this, "mark 자료가 없습니다.", Toast.LENGTH_SHORT).show();
+                        } else {
+                            String str;
+                            ArrayList<String> tmp=new ArrayList();
+                            switch (position) {
+                                case 0:
+                                    str = data.date + "  :  Script#1";
+                                    break;
+                                case 1:
+                                    str = data.date + "  :  Script#2";
+                                    break;
+                                case 2:
+                                    str = data.date + "  :  Dialog";
+                                    break;
+                                default:
+                                    throw new IllegalStateException("Unexpected value: " + position);
+                            }
+                            if(user.getMark()==null){
+                                Log.d(TAG,"mark==null");
+                                tmp.add(str);
+                                Toast.makeText(HomeActivity.this, "mark 설정완료", Toast.LENGTH_SHORT).show();
+                            }
+                            else {
+                                tmp=user.getMark();
+                                if (tmp.contains(str)) {
+                                    Log.d(TAG,"remove");
+                                    tmp.remove(str);
+                                    Toast.makeText(HomeActivity.this, "mark 해제완료", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    Log.d(TAG,"add");
+                                    tmp.add(str);
+                                    Toast.makeText(HomeActivity.this, "mark 설정완료", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                            tmp.remove("");
+                            String s=String.join(",",tmp);
+                            Log.d(TAG,s);
+                            db.collection("User")
+                                    .document(user.getId())
+                                    .update("Mark",s);
+                            user.updateMark();
                         }
                         break;
                 }
@@ -230,6 +288,15 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
                 Mname=(TextView)findViewById(R.id.main_name);
                 Mname.setText(user.getId());
                 Mlogout = (TextView)findViewById(R.id.main_logout);
+                markbt=(TextView)findViewById(R.id.markbt);
+                markbt.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent mark_intent = new Intent(HomeActivity.this, MarkActivity.class);
+                        mark_intent.putExtra("user",(Parcelable)user);
+                        startActivity(mark_intent);
+                    }
+                });
                 Mlogout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
