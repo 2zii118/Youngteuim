@@ -8,17 +8,21 @@ import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class User implements Serializable, Parcelable {
     String id;
     String name;
     String cellphone;
     String mail;
+    ArrayList<String> mark=new ArrayList<>();
 
     FirebaseFirestore db= FirebaseFirestore.getInstance();
     private static final String TAG = "User";
@@ -32,10 +36,11 @@ public class User implements Serializable, Parcelable {
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.d(TAG, document.getId() + " => " + document.getData());
+                                Log.d(TAG, "make user");
                                 name=document.get("NAME").toString();
                                 cellphone=document.get("Phone").toString();
                                 mail=document.get("Email").toString();
+                                mark.addAll(Arrays.asList(document.get("mark").toString().split(",")));
                             }
                         }
 
@@ -49,6 +54,7 @@ public class User implements Serializable, Parcelable {
         name = in.readString();
         cellphone = in.readString();
         mail = in.readString();
+        mark= (ArrayList<String>)in.readSerializable();
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {
@@ -74,8 +80,27 @@ public class User implements Serializable, Parcelable {
         parcel.writeString(name);
         parcel.writeString(cellphone);
         parcel.writeString(mail);
+        parcel.writeSerializable(mark);
     }
     public String getId(){
         return this.id;
     }
+    public ArrayList<String> getMark(){ return this.mark; }
+    public void updateMark(){
+        db.collection("User").document(id)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+                                        mark.clear();
+                                        mark.addAll(Arrays.asList(document.get("Mark").toString().split(",")));
+                                }
+                            }
+                        }
+                });
+    }
+
 }

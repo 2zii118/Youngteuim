@@ -66,6 +66,7 @@ public class LoginActivity extends AppCompatActivity {
                                             if (document.get("PW").toString().equals(pwEt.getText().toString())) {
                                                 Intent home_intent = new Intent(LoginActivity.this, HomeActivity.class);
                                                 User user = new User(idEt.getText().toString());
+                                                user.updateMark();
                                                 home_intent.putExtra("user",(Parcelable)user);
                                                 startActivity(home_intent);
                                                 Log.d(TAG, "success Login");
