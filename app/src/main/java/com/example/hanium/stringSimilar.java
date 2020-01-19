@@ -5,6 +5,8 @@ public class stringSimilar {
 
     public static Point stringsSimilar(String s1, String s2) {
         Point point = new Point();
+        String match = "[^\uAC00-\uD7A3xfe0-9a-zA-Z\\s.]";
+        s1 =s1.replaceAll(match, "");
         int characterChanges = getLevenshteinDistance(s1, s2);
         int wordChanges = getWordChanges(s1, s2);
         int characterCountChange = Math.abs(s1.length() - s2.length());

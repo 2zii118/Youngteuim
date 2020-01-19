@@ -56,8 +56,8 @@ public class ChatArrayAdapter extends ArrayAdapter {
         chatText.setText(chatMessageObj.message);
         //chatText.setTextColor();
         if(chatMessageObj.left==3){ //stt & 점수
-            chatText.setBackgroundColor(Color.parseColor("#FFFFFFFF"));
-            chatText.setTextColor(Color.BLACK);
+            chatText.setBackgroundResource( R.drawable.bubble_score);
+            //chatText.setTextColor(Color.BLACK);
             singleMessageContainer.setGravity(Gravity.RIGHT);
         }
         else if(chatMessageObj.left==1){//컴퓨터가 하는 문장
