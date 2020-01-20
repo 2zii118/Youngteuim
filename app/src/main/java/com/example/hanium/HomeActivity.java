@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewManager;
+import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CalendarView;
@@ -46,6 +47,7 @@ import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -67,6 +69,7 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
     MaterialCalendarView cal;
     User user;
     String[] thing;
+    final ArrayList<String> record_list=new ArrayList<>();
     private final OneDayDecorator oneDayDecorator = new OneDayDecorator();
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState){
@@ -81,6 +84,7 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
 
         user = (User) getIntent().getParcelableExtra("user");
         user.updateMark();
+        user.updateRecord();
         Log.d(TAG, user.getId());
 
         listAdapter=new ListDataAdapter();
@@ -126,16 +130,19 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
                                 case 0:
                                     data.setData("s1");
                                     Script_intent.putExtra("data", (Parcelable) data);
+                                    Script_intent.putExtra("user",(Parcelable)user);
                                     startActivity(Script_intent);
                                     break;
                                 case 1:
                                     data.setData("s2");
                                     Script_intent.putExtra("data", (Parcelable) data);
+                                    Script_intent.putExtra("user",(Parcelable)user);
                                     startActivity(Script_intent);
                                     break;
                                 case 2:
                                     data.setData("d");
                                     Chat_intent.putExtra("data", (Parcelable) data);
+                                    Chat_intent.putExtra("user",(Parcelable)user);
                                     startActivity(Chat_intent);
                                     break;
                             }
@@ -305,22 +312,23 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
             }
         });
 
-        db.collection("sentence")
-                .whereEqualTo("check","done")
+        //여기여기//////////////
+        db.collection("User").document(user.getId())
                 .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        List donedate = new ArrayList();
-                        if(task.isSuccessful()) {
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                Log.d(TAG, "=>" + document.getId());
-                                donedate.add(document.getId());
-                                new ApiSimulator(donedate).executeOnExecutor(Executors.newSingleThreadExecutor());
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+
+                                    record_list.addAll(Arrays.asList(document.get("Record").toString().split(",")));
+                                    Log.d(TAG, "record 전체 출력 : "+record_list);
+                                    new ApiSimulator(record_list).executeOnExecutor(Executors.newSingleThreadExecutor());
+
+                            } else {
+
                             }
-                        }
-                        else{
-                            Log.d(TAG,"Error getting documents: ",task.getException());
                         }
                     }
                 });
@@ -405,10 +413,9 @@ public class HomeActivity<listAdapter> extends AppCompatActivity {
 
     //달력 Dot
     private class ApiSimulator extends AsyncTask<Void, Void, List<CalendarDay>> {
-
-        List study_record = new ArrayList();
-        ApiSimulator(List donedate){
-            this.study_record=donedate;
+        ArrayList<String> study_record=new ArrayList<>();
+        ApiSimulator(ArrayList<String> study_record){
+            this.study_record=study_record;
         }
 
         @Override

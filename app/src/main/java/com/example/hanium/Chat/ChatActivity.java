@@ -22,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.example.hanium.HomeActivity;
 import com.example.hanium.IntentData;
 import com.example.hanium.Point;
 import com.example.hanium.R;
@@ -74,7 +75,7 @@ public class ChatActivity extends AppCompatActivity {
     int step = 0;
     Point point;
     User user;
-    //String[] study_record;
+    final ArrayList<String> study_record=new ArrayList<>();
     //Map<String, Object> record = new HashMap<>();
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -177,8 +178,10 @@ public class ChatActivity extends AppCompatActivity {
                 if(step>=4&&chatnum==3){
                     Toast.makeText(ChatActivity.this, "학습을 완료하였습니다.", Toast.LENGTH_SHORT).show();
                     buttonSend.setText("<   학습 완료   >");
+                    //Log.d(TAG,"아이디 : "+user.getId());
                     //record.put("check","done");
-                    DocumentReference chRef = db.collection("User").document(date);
+                    /*DocumentReference chRef = db.collection("User").document(user.getId());
+                    study_record.add(date);
                     chRef.update("check","done")
                             .addOnSuccessListener(new OnSuccessListener<Void>() {
                                 @Override
@@ -191,7 +194,28 @@ public class ChatActivity extends AppCompatActivity {
                                 public void onFailure(@NonNull Exception e) {
                                     Log.w(TAG, "Error updating document", e);
                                 }
-                            });
+                            });*/
+                    String study_date;
+                    ArrayList<String> tmp=new ArrayList();
+                    study_date = date;
+                    if(user.getRecord() == null){
+                        Log.d(TAG,"Record==null");
+                        tmp.add(study_date);
+                        Toast.makeText(ChatActivity.this, "학습 완료", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        tmp=user.getRecord();
+                        Log.d(TAG,"add");
+                        tmp.add(study_date);
+                        Toast.makeText(ChatActivity.this, "학습완료", Toast.LENGTH_SHORT).show();
+                    }
+                    tmp.remove("");
+                    String s=String.join(",",tmp);
+                    Log.d(TAG,"추가될 record : "+s);
+                    db.collection("User")
+                            .document(user.getId())
+                            .update("Record",s);
+                    user.updateRecord();
                 }
                 else{
                     if(step%2==0) {
@@ -207,7 +231,7 @@ public class ChatActivity extends AppCompatActivity {
                     else {
                         for (cnt = 0; cnt <= 9; cnt = cnt + 2) {
                             if ((keyArray[cnt].startsWith("b" + chatnum)) && check == false) {
-                                sendChatMessage(2,map.get(keyArray[cnt]).replace(". ",".\n"));
+                                sendChatMessage(2,map.get(keyArray[cnt]).replace(". ",".\n") + "\n" + map.get(keyArray[cnt + 1]).replace(". ",".\n"));
                                 mHandler.postDelayed(mMyTask, 1000);
                                 myBroadCastReceiver = new MyBroadcastReceiver();
                                 IntentFilter intentFilter = new IntentFilter();

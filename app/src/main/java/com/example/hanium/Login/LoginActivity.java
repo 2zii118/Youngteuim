@@ -67,6 +67,7 @@ public class LoginActivity extends AppCompatActivity {
                                                 Intent home_intent = new Intent(LoginActivity.this, HomeActivity.class);
                                                 User user = new User(idEt.getText().toString());
                                                 user.updateMark();
+                                                user.updateRecord();
                                                 home_intent.putExtra("user",(Parcelable)user);
                                                 startActivity(home_intent);
                                                 Log.d(TAG, "success Login");

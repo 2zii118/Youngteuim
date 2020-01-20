@@ -23,6 +23,7 @@ public class User implements Serializable, Parcelable {
     String cellphone;
     String mail;
     ArrayList<String> mark=new ArrayList<>();
+    ArrayList<String> record=new ArrayList<>();
 
     FirebaseFirestore db= FirebaseFirestore.getInstance();
     private static final String TAG = "User";
@@ -41,6 +42,7 @@ public class User implements Serializable, Parcelable {
                                 cellphone=document.get("Phone").toString();
                                 mail=document.get("Email").toString();
                                 mark.addAll(Arrays.asList(document.get("mark").toString().split(",")));
+                                record.addAll(Arrays.asList(document.get("Record").toString().split(",")));
                             }
                         }
 
@@ -55,6 +57,7 @@ public class User implements Serializable, Parcelable {
         cellphone = in.readString();
         mail = in.readString();
         mark= (ArrayList<String>)in.readSerializable();
+        record= (ArrayList<String>)in.readSerializable();
     }
 
     public static final Creator<User> CREATOR = new Creator<User>() {
@@ -81,6 +84,7 @@ public class User implements Serializable, Parcelable {
         parcel.writeString(cellphone);
         parcel.writeString(mail);
         parcel.writeSerializable(mark);
+        parcel.writeSerializable(record);
     }
     public String getId(){
         return this.id;
@@ -100,6 +104,23 @@ public class User implements Serializable, Parcelable {
                                 }
                             }
                         }
+                });
+    }
+    public ArrayList<String> getRecord(){ return this.record; }
+    public void updateRecord(){
+        db.collection("User").document(id)
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+                                record.clear();
+                                record.addAll(Arrays.asList(document.get("Record").toString().split(",")));
+                            }
+                        }
+                    }
                 });
     }
 

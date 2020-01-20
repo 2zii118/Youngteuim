@@ -21,6 +21,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.example.hanium.Chat.ChatActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -47,15 +48,16 @@ public class ScriptActivity extends AppCompatActivity {
     String skor,seng,data,date;
     String[] stringe,stringk;
     ArrayAdapter<String> adapterstt,adapter;
-
+    User user;
     int cnt=-1,cnt1=-1;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState){
     super.onCreate(savedInstanceState);
     setContentView(R.layout.script_interface);
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+    user = getIntent().getParcelableExtra("user");
     intentdata = (IntentData) getIntent().getParcelableExtra("data");
     date=intentdata.getDate();
     data=intentdata.getData();
@@ -215,7 +217,30 @@ public class ScriptActivity extends AppCompatActivity {
                 adapterstt.notifyDataSetChanged();
                 unregisterReceiver(myBroadCastReceiver);
                 repeatbt.setText(" #"+(cnt1+1)+" 따라하기");
-                if((cnt1+1)>=stringe.length)cnt1=-1;
+                if((cnt1+1)>=stringe.length) {
+                    cnt1 = -1;
+                    String study_date;
+                    ArrayList<String> tmp=new ArrayList();
+                    study_date = date;
+                    if(user.getRecord() == null){
+                        Log.d(TAG,"Record==null");
+                        tmp.add(study_date);
+                        Toast.makeText(ScriptActivity.this, "학습 완료", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        tmp=user.getRecord();
+                        Log.d(TAG,"add");
+                        tmp.add(study_date);
+                        Toast.makeText(ScriptActivity.this, "학습완료", Toast.LENGTH_SHORT).show();
+                    }
+                    tmp.remove("");
+                    String s=String.join(",",tmp);
+                    Log.d(TAG,"추가될 record : "+s);
+                    db.collection("User")
+                            .document(user.getId())
+                            .update("Record",s);
+                    user.updateRecord();
+                }
 
                 if(STTservice != null) {
                     stopService(STTservice);
